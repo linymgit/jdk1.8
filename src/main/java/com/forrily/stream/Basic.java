@@ -2,6 +2,7 @@ package com.forrily.stream;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -37,11 +38,15 @@ public class Basic {
 
         //reduceEt();
 
-        //compareStreamWithParallelStream();
+        compareStreamWithParallelStream();
 
         //processingSequence();
 
-        processingSequenceEt();
+        //processingSequenceEt();
+
+        //processingSequenceEt2();
+
+       // reuseStream();
     }
 
     /**
@@ -253,6 +258,56 @@ public class Basic {
         );
     }
 
+    /**
+     * 执行顺序的重要性, sort根本没执行!!!
+     * 注：观察执行结果
+     * filter: l
+     * filter: i
+     * filter: n
+     * filter: y
+     * filter: m
+     * map: i
+     * forEach: I
+     */
+    static void processingSequenceEt2(){
+        Stream.of("l", "i", "n", "y", "m").filter(s -> {
+            System.out.println("filter: " + s);
+            return s.equals("i");
+        }).sorted((o1,o2)->{
+            System.out.println("sort: "+o1+" "+o2);
+            return o1.compareTo(o2);
+        }).map(s -> {
+            System.out.println("map: " + s);
+            return s.toUpperCase();
+        }).forEach(s ->
+                System.out.println("forEach: " + s)
+        );
+    }
 
+
+    /**
+     * 流的复用
+     */
+    static void reuseStream(){
+        Stream<String> stream = Stream.of("l", "i", "n", "y", "m");
+        // true;
+        stream.anyMatch(s->s.equals("l"));
+        /**
+         * Java8的数据流不能被复用。一旦你调用了任何终止操作，数据流就关闭了：
+         * Exception in thread "main" java.lang.IllegalStateException: stream has already been operated upon or closed
+         * 	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:229)
+         * 	at java.util.stream.ReferencePipeline.anyMatch(ReferencePipeline.java:449)
+         * 	at com.forrily.stream.Basic.reuseStream(Basic.java:293)
+         * 	at com.forrily.stream.Basic.main(Basic.java:48)
+         */
+        // stream.anyMatch(s->s.equals("i"));
+
+        Supplier<Stream<String>> streamSupplier = ()->Stream.of("l", "i", "n", "y", "m");
+
+        System.out.println(streamSupplier.get().anyMatch(s -> s.equals("l")));
+
+        System.out.println(streamSupplier.get().anyMatch(s -> s.equals("i")));
+
+    }
 
 }
