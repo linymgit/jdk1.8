@@ -15,7 +15,9 @@ import java.util.Locale;
 public class App {
     public static void main(String[] args) {
 
-        timezonesEt();
+        // timezonesEt();
+
+        interval();
     }
 
     /**
@@ -109,5 +111,13 @@ public class App {
         LocalDateTime parsed = LocalDateTime.parse("Apr 27, 2019 - 16:48", formatter);
         String string = formatter.format(parsed);
         System.out.println(string);
+    }
+
+    /**
+     * 时间间隔
+     */
+    static void interval(){
+        System.err.println(LocalDateTime.now().until(
+                LocalDateTime.of(2019, 5, 4, 0, 0, 0), ChronoUnit.DAYS));
     }
 }
